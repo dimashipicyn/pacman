@@ -16,7 +16,8 @@
         "CMAKE_CXX_STANDARD": "17",
         "CMAKE_CXX_STANDARD_REQUIRED": "ON",
         "CMAKE_CXX_EXTENSIONS": "OFF",
-        "CMAKE_PREFIX_PATH": "$env{QTROOT}"
+        "CMAKE_PREFIX_PATH": "$env{QTROOT}",
+        "CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/bin"
       }
     },
 

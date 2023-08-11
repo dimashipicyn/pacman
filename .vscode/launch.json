@@ -8,7 +8,7 @@
             "type": "lldb",
             "request": "launch",
             "name": "Debug",
-            "program": "${workspaceFolder}/build/app.exe",
+            "program": "${workspaceFolder}/bin/cpp_template_proj.exe",
             "args": [],
             "cwd": "${workspaceFolder}"
         }
