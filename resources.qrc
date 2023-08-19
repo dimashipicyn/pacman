@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>assets/general.png</file>
+        <file>assets/maze.png</file>
+        <file>assets/pacman.tsx</file>
+        <file>assets/map.tmx</file>
+        <file>assets/maze.tsx</file>
+    </qresource>
+</RCC>
