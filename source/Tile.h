@@ -1,9 +1,11 @@
+#pragma once
+
 #include <QGraphicsItem>
 #include <QTimer>
 #include <QPixmap>
 #include <QPainter>
 
-class Sprite : public QObject, public QGraphicsItem
+class Tile : public QObject, public QGraphicsItem
 {
     Q_OBJECT
 public:
@@ -13,7 +15,7 @@ public:
         int duration;
     };
 
-    Sprite(QPixmap image, QVector<Frame> frames, QObject* parent = nullptr);
+    Tile(QPixmap image, QVector<Frame> frames, QObject* parent = nullptr);
 
     void playAnimation(bool play);
     void repeatAnimation(bool repeat);

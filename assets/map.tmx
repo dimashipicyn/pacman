@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="28" height="31" tilewidth="8" tileheight="8" infinite="0" nextlayerid="3" nextobjectid="12">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="28" height="31" tilewidth="8" tileheight="8" infinite="0" nextlayerid="6" nextobjectid="23">
  <tileset firstgid="1" source="maze.tsx"/>
- <tileset firstgid="145" source="pacman.tsx"/>
  <layer id="1" name="map" width="28" height="31">
   <data encoding="csv">
 2,11,11,11,11,11,11,11,11,11,44,43,11,11,11,11,44,43,11,11,11,11,11,11,11,11,11,1,
@@ -38,10 +37,60 @@
 </data>
  </layer>
  <objectgroup id="2" name="objects">
-  <object id="1" name="pacman" gid="147" x="103.219" y="181.474" width="16" height="16"/>
-  <object id="6" name="blinky" gid="203" x="103.158" y="91.6491" width="16" height="16"/>
-  <object id="7" name="inky" gid="233" x="87.5" y="112.5" width="16" height="16"/>
-  <object id="8" name="pinky" gid="221" x="103" y="112.5" width="16" height="16"/>
-  <object id="9" name="clyde" gid="247" x="118" y="112.5" width="16" height="16"/>
+  <object id="14" name="pacman" x="104" y="163.333" width="16" height="16">
+   <properties>
+    <property name="destroy_tile" value="pacman_destroy"/>
+    <property name="down_tile" value="pacman_down"/>
+    <property name="idle_tile" value="pacman_idle"/>
+    <property name="left_tile" value="pacman_left"/>
+    <property name="right_tile" value="pacman_right"/>
+    <property name="tileset" value="pacman.tsx"/>
+    <property name="up_tile" value="pacman_up"/>
+   </properties>
+  </object>
+  <object id="19" name="blinky" x="104" y="76.3333" width="16" height="16">
+   <properties>
+    <property name="destroy_tile" value="blinky_destroy"/>
+    <property name="down_tile" value="blinky_down"/>
+    <property name="idle_tile" value="blinky_idle"/>
+    <property name="left_tile" value="blinky_left"/>
+    <property name="right_tile" value="blinky_right"/>
+    <property name="tileset" value="pacman.tsx"/>
+    <property name="up_tile" value="blinky_up"/>
+   </properties>
+  </object>
+  <object id="20" name="clyde" x="120.333" y="96" width="16" height="16">
+   <properties>
+    <property name="destroy_tile" value="clyde_destroy"/>
+    <property name="down_tile" value="clyde_down"/>
+    <property name="idle_tile" value="clyde_idle"/>
+    <property name="left_tile" value="clyde_left"/>
+    <property name="right_tile" value="clyde_right"/>
+    <property name="tileset" value="pacman.tsx"/>
+    <property name="up_tile" value="clyde_up"/>
+   </properties>
+  </object>
+  <object id="21" name="pinky" x="104" y="96" width="16" height="16">
+   <properties>
+    <property name="destroy_tile" value="pinky_destroy"/>
+    <property name="down_tile" value="pinky_down"/>
+    <property name="idle_tile" value="pinky_idle"/>
+    <property name="left_tile" value="pinky_left"/>
+    <property name="right_tile" value="pinky_right"/>
+    <property name="tileset" value="pacman.tsx"/>
+    <property name="up_tile" value="pinky_up"/>
+   </properties>
+  </object>
+  <object id="22" name="inky" x="87.6667" y="95.6667" width="16" height="16">
+   <properties>
+    <property name="destroy_tile" value="inky_destroy"/>
+    <property name="down_tile" value="inky_down"/>
+    <property name="idle_tile" value="inky_idle"/>
+    <property name="left_tile" value="inky_left"/>
+    <property name="right_tile" value="inky_right"/>
+    <property name="tileset" value="pacman.tsx"/>
+    <property name="up_tile" value="inky_up"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

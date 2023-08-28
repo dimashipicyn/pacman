@@ -1,3 +1,5 @@
+#pragma once
+
 #include <QObject>
 #include <QPixmap>
 #include <QXmlStreamAttributes>
@@ -6,19 +8,21 @@
 #include <QVector>
 #include <QHash>
 
-class Sprite;
+class Tile;
 
-class SpriteSheet : public QObject
+class TsxTileset : public QObject
 {
 	Q_OBJECT
 public:
-    SpriteSheet(QObject* parent = nullptr);
+    TsxTileset(QObject* parent = nullptr);
 
     bool load(const QString& tsx_path);
     
-    int sprites() const;
-    Sprite* getSprite(const QString& type);
-    Sprite* getSprite(int id);
+    int tileCount() const;
+    int tileWidth() const;
+    int tileHeight() const;
+    Tile* getTile(const QString& type);
+    Tile* getTile(int id);
 
 private:
     struct AnimationFrame
@@ -27,7 +31,7 @@ private:
         int duration;
     };
 
-    struct Tile
+    struct TilesetTile
     {
         int id;
         QString type;
@@ -40,11 +44,11 @@ private:
     void parse_tile(QXmlStreamReader& reader);
 
     QRect getTileRect(int id);
-    Tile getTileByType(const QString& type);
+    TilesetTile getTileByType(const QString& type);
 
 private:
     QPixmap image_;
-    QHash<QString, Tile> tiles_;
+    QHash<QString, TilesetTile> tiles_;
     QHash<int, QString> ids_;
     QString source_;
     int tilewidth_ = 0;

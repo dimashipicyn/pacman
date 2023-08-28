@@ -1,3 +1,7 @@
+#pragma once
+
+#include "TmxObject.h"
+
 #include <QObject>
 #include <QGraphicsItem>
 #include <QString>
@@ -6,22 +10,19 @@
 #include <QRect>
 #include <QXmlStreamReader>
 #include <QXmlStreamAttributes>
+#include <QDebug>
 
-class SpriteSheet;
-class Sprite;
+class TsxTileset;
+class Tile;
 
-class Map : public QObject, public QGraphicsItem
+class TmxMap : public QObject, public QGraphicsItem
 {
 public:
+    TmxMap(QObject* parent = nullptr);
+
     bool load(const QString& tmx_path);
 
-    struct Object
-    {
-        QString name;
-        int id;
-        int gid;
-        QRect rect;
-    };
+    TmxObject getObject(const QString& name) const;
 
 private:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
@@ -29,10 +30,12 @@ private:
 
     void parse_tileset(const QXmlStreamAttributes& attrs);
     void parse_layer(QXmlStreamReader& reader);
+    void parse_objects(QXmlStreamReader& reader);
+    void parse_properties(QXmlStreamReader& reader, TmxObject& dest);
 
     struct Tileset
     {
-        SpriteSheet* sheet = nullptr;
+        TsxTileset* tileset = nullptr;
         QString source;
         int first_gid;
     };
@@ -40,8 +43,8 @@ private:
 private:
     QVector<int> map_;
     QVector<Tileset> tilesets_;
-    QHash<int, Sprite*> sprites_;
-    QHash<QString, Object> objects_;
+    QHash<int, Tile*> sprites_;
+    QHash<QString, TmxObject> objects_;
     int width_ = 0;
     int height_ = 0;
 };

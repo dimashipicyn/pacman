@@ -1,3 +1,5 @@
+#pragma once
+
 #include <QGraphicsView>
 
 class MainView : public QGraphicsView

@@ -1,6 +1,6 @@
-#include "Sprite.h"
+#include "Tile.h"
 
-Sprite::Sprite(QPixmap image, QVector<Frame> frames, QObject* parent)
+Tile::Tile(QPixmap image, QVector<Frame> frames, QObject* parent)
     : QObject(parent)
     , QGraphicsItem()
     , image_ { image }
@@ -9,50 +9,50 @@ Sprite::Sprite(QPixmap image, QVector<Frame> frames, QObject* parent)
 {
     if (frames_.size() > 1)
     {
-        connect(&timer_, &QTimer::timeout, this, &Sprite::nextFrame);
+        connect(&timer_, &QTimer::timeout, this, &Tile::nextFrame);
         timer_.start(frames_[currentFrame_].duration);
     }
 }
 
-void Sprite::playAnimation(bool play)
+void Tile::playAnimation(bool play)
 {
     playedAnimation_ = play;
 }
 
-void Sprite::repeatAnimation(bool repeat)
+void Tile::repeatAnimation(bool repeat)
 {
     repeatedAnimation_ = repeat;
 }
  
-bool Sprite::isPlayedAnimation() const
+bool Tile::isPlayedAnimation() const
 {
     return playedAnimation_;
 }
 
-bool Sprite::isEndAnimation() const
+bool Tile::isEndAnimation() const
 {
     return !isRepeated() && !isPlayedAnimation();
 }
 
-bool Sprite::isRepeated() const
+bool Tile::isRepeated() const
 {
     return repeatedAnimation_;
 }
 
-void Sprite::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+void Tile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     const Frame& frame = frames_[currentFrame_];
     painter->drawPixmap(pos(), image_, frame.rect);
 }
 
-QRectF Sprite::boundingRect() const
+QRectF Tile::boundingRect() const
 {
     const qreal penWidth = 1;
     const QRect& rect = frames_[currentFrame_].rect;
     return QRectF(pos().x() - penWidth, pos().y() - penWidth, rect.width() + penWidth, rect.height() + penWidth);
 }
 
-void Sprite::nextFrame()
+void Tile::nextFrame()
 {
     ++currentFrame_;
     currentFrame_ %= frames_.size();

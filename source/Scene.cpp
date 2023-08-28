@@ -1,9 +1,8 @@
 #include "Scene.h"
 
 #include "Pacman.h"
-#include "Sprite.h"
-#include "SpriteSheet.h"
-#include "Map.h"
+#include "TsxTileset.h"
+#include "TmxMap.h"
 
 #include <QKeyEvent>
 
@@ -25,18 +24,12 @@ quint64 secToMs(float sec)
 Scene::Scene(QObject* parent)
     : QGraphicsScene(parent)
 {
-    Map* map = new Map;
-    map->load(":/assets/map.tmx");
-    map->setScale(2);
-    addItem(map);
+    map_ = new TmxMap(this);
+    map_->load(":/assets/map.tmx");
+    map_->setScale(2);
+    addItem(map_);
 
-    SpriteSheet* sh = new SpriteSheet;
-    sh->load(":/assets/pacman.tsx");
-
-    pacman_ = new Pacman(sh);
-    pacman_->setSpeed(50);
-    pacman_->setScale(2);
-    addItem(pacman_);
+    create_objects();
 
     timer_ = new QTimer(this);
     timer_->start(secToMs(frame_time));
@@ -53,19 +46,19 @@ void Scene::keyPressEvent(QKeyEvent* event)
         {
         case Qt::Key_Left:
         case Qt::Key_A:
-            pacman_->setState(Pacman::Left);
+            pacman_->setState(MovableSprite::Left);
             break;
         case Qt::Key_Right:
         case Qt::Key_D:
-            pacman_->setState(Pacman::Right);
+            pacman_->setState(MovableSprite::Right);
             break;
         case Qt::Key_Up:
         case Qt::Key_W:
-            pacman_->setState(Pacman::Up);
+            pacman_->setState(MovableSprite::Up);
             break;
         case Qt::Key_Down:
         case Qt::Key_S:
-            pacman_->setState(Pacman::Down);
+            pacman_->setState(MovableSprite::Down);
             break;
         default:
             break;
@@ -87,4 +80,26 @@ void Scene::update()
     pacman_->move(delta_time_sec_);
 
     QGraphicsScene::update();
+}
+
+void Scene::create_objects()
+{
+    TmxObject obj = map_->getObject("pacman");
+
+    TsxTileset* sheet = new TsxTileset(this);
+    sheet->load(":/assets/" + obj.getProperty("tileset"));
+
+    pacman_ = new MovableSprite(
+        sheet->getTile(obj.getProperty("idle_tile")),
+        sheet->getTile(obj.getProperty("up_tile")),
+        sheet->getTile(obj.getProperty("down_tile")),
+        sheet->getTile(obj.getProperty("left_tile")),
+        sheet->getTile(obj.getProperty("right_tile")),
+        sheet->getTile(obj.getProperty("destroy_tile")),
+        this);
+
+    pacman_->setSpeed(20);
+    pacman_->setScale(2);
+
+    addItem(pacman_);
 }

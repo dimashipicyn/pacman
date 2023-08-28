@@ -1,18 +1,27 @@
+#pragma once
+
 #include <QObject>
 #include <QVector>
 #include <QGraphicsItem>
 
-class SpriteSheet;
-class Sprite;
+class Tile;
 
-class Pacman : public QObject, public QGraphicsItem
+class MovableSprite : public QObject, public QGraphicsItem
 {
     Q_OBJECT
 public:
-    Pacman(SpriteSheet* sheet, QObject* parent = nullptr);
+    MovableSprite(
+        Tile* idle_sprite,
+        Tile* up_sprite,
+        Tile* down_sprite,
+        Tile* left_sprite,
+        Tile* right_sprite,
+        Tile* destroy_sprite,
+        QObject* parent = nullptr);
 
     enum State
     {
+        BeginState = -1,
         Idle,
         Up,
         Down,
@@ -30,14 +39,9 @@ private:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
     QRectF boundingRect() const override;
 
-    void updateSprite();
-
-    void connectSprite();
-    void disconnectSprite();
-
 private:
-    Sprite* sprites_[StatesCount] = { nullptr };
-    State state_ = Up;
-    QPointF direction_;
+    Tile* sprites_[StatesCount] = { nullptr };
+    QPointF directions_[StatesCount] = {};
+    State state_ = Idle;
     float speed_ = 0;
 };

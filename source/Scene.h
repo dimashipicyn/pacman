@@ -1,9 +1,12 @@
+#pragma once
+
 #include <QGraphicsScene>
 #include <QTimer>
 #include <QElapsedTimer>
 
-class Pacman;
-class Sprite;
+class MovableSprite;
+class Tile;
+class TmxMap;
 
 class Scene : public QGraphicsScene
 {
@@ -15,11 +18,15 @@ protected:
     virtual void keyPressEvent(QKeyEvent* event) override;
     virtual void keyReleaseEvent(QKeyEvent* event) override;
 
+private:
     void update();
+    void create_objects();
 
 private:
     QTimer* timer_ = nullptr;
     QElapsedTimer elapsed_timer_;
-    Pacman* pacman_;
+
+    TmxMap* map_ = nullptr;
+    MovableSprite* pacman_;
     float delta_time_sec_ = 0;
 };

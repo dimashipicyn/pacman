@@ -8,7 +8,7 @@ set(CMAKE_AUTOUIC ON)
 add_executable(${PROJECT_NAME}
     main.cpp
     resources.qrc
- "source/Sprite.h" "source/Sprite.cpp" "source/SpriteSheet.h" "source/SpriteSheet.cpp" "source/Pacman.h" "source/Pacman.cpp" "source/Scene.h" "source/Scene.cpp" "source/Entity.h" "source/Entity.cpp" "source/Map.h" "source/Map.cpp")
+)
 
 add_subdirectory(source)
 add_subdirectory(third_party)

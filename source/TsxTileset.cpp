@@ -1,18 +1,18 @@
-#include "SpriteSheet.h"
+#include "TsxTileset.h"
 
-#include "Sprite.h"
+#include "Tile.h"
 
 #include <QFile>
 #include <QXmlStreamReader>
 #include <QDebug>
 
-SpriteSheet::SpriteSheet(QObject* parent)
+TsxTileset::TsxTileset(QObject* parent)
     : QObject(parent)
 {
 
 }
 
-bool SpriteSheet::load(const QString& tsx_path)
+bool TsxTileset::load(const QString& tsx_path)
 {
     QFile file(tsx_path);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -54,10 +54,25 @@ bool SpriteSheet::load(const QString& tsx_path)
     return true;
 }
 
-Sprite* SpriteSheet::getSprite(const QString& type)
+int TsxTileset::tileCount() const
 {
-    Tile tile = getTileByType(type);
-    QVector<Sprite::Frame> frames;
+    return tilecount_;
+}
+
+int TsxTileset::tileWidth() const
+{
+    return tilewidth_;
+}
+
+int TsxTileset::tileHeight() const
+{
+    return tileheight_;
+}
+
+Tile* TsxTileset::getTile(const QString& type)
+{
+    TilesetTile tile = getTileByType(type);
+    QVector<Tile::Frame> frames;
     if (tile.animation.empty())
     {
         frames.push_back({ getTileRect(tile.id), 0});
@@ -70,25 +85,20 @@ Sprite* SpriteSheet::getSprite(const QString& type)
         }
     }
 
-    return new Sprite(image_, std::move(frames), this);
+    return new Tile(image_, std::move(frames), this);
 }
 
-Sprite* SpriteSheet::getSprite(int id)
+Tile* TsxTileset::getTile(int id)
 {
     if (ids_.contains(id))
     {
-        return getSprite(ids_.value(id));
+        return getTile(ids_.value(id));
     }
 
-    return new Sprite(image_, { { getTileRect(id), 0 } }, this);
+    return new Tile(image_, { { getTileRect(id), 0 } }, this);
 }
 
-int SpriteSheet::sprites() const
-{
-    return tilecount_;
-}
-
-void SpriteSheet::parse_tileset(const QXmlStreamAttributes& attrs)
+void TsxTileset::parse_tileset(const QXmlStreamAttributes& attrs)
 {
     tilewidth_ = attrs.value("tilewidth").toInt();
     tileheight_ = attrs.value("tileheight").toInt();
@@ -98,16 +108,16 @@ void SpriteSheet::parse_tileset(const QXmlStreamAttributes& attrs)
     columns_ = attrs.value("columns").toInt();
 }
 
-void SpriteSheet::parse_image(const QXmlStreamAttributes& attrs)
+void TsxTileset::parse_image(const QXmlStreamAttributes& attrs)
 {
     source_ = attrs.value("source").toString();
 }
 
-void SpriteSheet::parse_tile(QXmlStreamReader& reader)
+void TsxTileset::parse_tile(QXmlStreamReader& reader)
 {
     QXmlStreamAttributes attrs = reader.attributes();
 
-    Tile tile;
+    TilesetTile tile;
 
     tile.id = attrs.value("id").toInt();
     tile.type = attrs.value("type").toString();
@@ -152,7 +162,7 @@ void SpriteSheet::parse_tile(QXmlStreamReader& reader)
     tiles_.insert(key, std::move(tile));
 }
 
-QRect SpriteSheet::getTileRect(int id)
+QRect TsxTileset::getTileRect(int id)
 {
     assert(id < tilecount_);
 
@@ -164,13 +174,13 @@ QRect SpriteSheet::getTileRect(int id)
     return QRect(x, y, tilewidth_, tileheight_);
 }
 
-SpriteSheet::Tile SpriteSheet::getTileByType(const QString& type)
+TsxTileset::TilesetTile TsxTileset::getTileByType(const QString& type)
 {
     if (auto it = tiles_.find(type); it != tiles_.end())
     {
         return *it;
     }
-    assert(false);
-    return Tile {};
+    assert(false && "TilesetTile not found");
+    return TilesetTile {};
 }
 
