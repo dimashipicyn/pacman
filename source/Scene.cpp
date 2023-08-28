@@ -3,6 +3,7 @@
 #include "Pacman.h"
 #include "TsxTileset.h"
 #include "TmxMap.h"
+#include "Tile.h"
 
 #include <QKeyEvent>
 
@@ -26,7 +27,6 @@ Scene::Scene(QObject* parent)
 {
     map_ = new TmxMap(this);
     map_->load(":/assets/map.tmx");
-    map_->setScale(2);
     addItem(map_);
 
     create_objects();
@@ -82,10 +82,38 @@ void Scene::update()
     QGraphicsScene::update();
 }
 
+class CustomItem : public QGraphicsItem
+{
+public:
+    CustomItem(QGraphicsItem* parent = nullptr)
+        : QGraphicsItem(parent)
+    {
+        // Set the item's size and properties
+        itemSize = QSizeF(50, 50);
+        setFlag(ItemIsMovable);
+    }
+
+    QRectF boundingRect() const override
+    {
+        return QRectF(0, 0, itemSize.width(), itemSize.height());
+    }
+
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override
+    {
+        // Define how to paint the item
+        painter->setBrush(Qt::blue); // Fill color
+        painter->setPen(Qt::black); // Outline color
+        painter->drawRect(boundingRect()); // Draw a rectangle
+    }
+
+private:
+    QSizeF itemSize;
+};
+
 void Scene::create_objects()
 {
     TmxObject obj = map_->getObject("pacman");
-
+    
     TsxTileset* sheet = new TsxTileset(this);
     sheet->load(":/assets/" + obj.getProperty("tileset"));
 
@@ -98,8 +126,8 @@ void Scene::create_objects()
         sheet->getTile(obj.getProperty("destroy_tile")),
         this);
 
+    pacman_->setPos(obj.rect.x(), obj.rect.y());
+    pacman_->setSize(obj.rect.size());
     pacman_->setSpeed(20);
-    pacman_->setScale(2);
-
     addItem(pacman_);
 }

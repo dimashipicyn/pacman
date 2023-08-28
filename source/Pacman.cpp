@@ -27,6 +27,8 @@ MovableSprite::MovableSprite(Tile* idle_sprite,
     directions_[Left] = QPointF(-1, 0);
     directions_[Right] = QPointF(1, 0);
     directions_[Destroy] = QPointF(0, 0);
+
+    setSize(sprites_[Idle]->size());
 }
 
 void MovableSprite::move(float dt)
@@ -48,7 +50,6 @@ void MovableSprite::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
 
 QRectF MovableSprite::boundingRect() const
 {
-    sprites_[state_]->setPos(pos());
     return sprites_[state_]->boundingRect();
 }
 
@@ -56,4 +57,12 @@ void MovableSprite::setState(State state)
 {
     state_ = state;
     assert(state > BeginState && state < StatesCount && "Wrong state");
+}
+
+void MovableSprite::setSize(QSize size)
+{
+    for (int i = BeginState + 1; i < StatesCount; ++i)
+    {
+        sprites_[i]->setSize(size);
+    }
 }

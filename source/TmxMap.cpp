@@ -40,6 +40,10 @@ bool TmxMap::load(const QString& tmx_path)
         {
             parse_layer(reader);
         }
+        else if (reader.name() == "map" && !reader.isEndElement())
+        {
+            parse_map(reader.attributes());
+        }
 
         reader.readNextStartElement();
     }
@@ -90,7 +94,8 @@ void TmxMap::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QW
         for (int x = 0; x < width_; ++x)
         {
             Tile* s = sprites_.value(map_[y * width_ + x]);
-            s->setPos(QPointF(x * 8, y * 8));
+            QPointF tile_pos = QPointF(rand() % 1000, rand() % 1000); //mapToItem(s, QPointF(x * tilewidth_, y * tileheight_));
+            s->setPos(tile_pos);
             s->paint(painter, option, widget);
         }
     }
@@ -98,7 +103,15 @@ void TmxMap::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QW
 
 QRectF TmxMap::boundingRect() const
 {
-    return QRectF(0, 0, width_ * 8, height_ * 8);
+    return QRectF(0, 0, width_ * tilewidth_, height_ * tileheight_);
+}
+
+void TmxMap::parse_map(const QXmlStreamAttributes& attrs)
+{
+    width_ = attrs.value("width").toInt();
+    height_ = attrs.value("height").toInt();
+    tilewidth_ = attrs.value("tilewidth").toInt();
+    tileheight_ = attrs.value("tileheight").toInt();
 }
 
 void TmxMap::parse_tileset(const QXmlStreamAttributes& attrs)
@@ -113,9 +126,6 @@ void TmxMap::parse_tileset(const QXmlStreamAttributes& attrs)
 void TmxMap::parse_layer(QXmlStreamReader& reader)
 {
     QXmlStreamAttributes attrs = reader.attributes();
-
-    width_ = attrs.value("width").toInt();
-    height_ = attrs.value("height").toInt();
 
     reader.readNextStartElement();
 
@@ -150,10 +160,10 @@ void TmxMap::parse_objects(QXmlStreamReader& reader)
         obj.name = attrs.value("name").toString();
         obj.id = attrs.value("gid").toInt();
 
-        int x = attrs.value("x").toInt();
-        int y = attrs.value("y").toInt();
-        int width = attrs.value("width").toInt();
-        int height = attrs.value("height").toInt();
+        float x = attrs.value("x").toFloat();
+        float y = attrs.value("y").toFloat();
+        float width = attrs.value("width").toFloat();
+        float height = attrs.value("height").toFloat();
         obj.rect = QRect(x, y, width, height);
 
         reader.readNextStartElement();

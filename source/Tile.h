@@ -1,9 +1,9 @@
 #pragma once
 
 #include <QGraphicsItem>
-#include <QTimer>
-#include <QPixmap>
 #include <QPainter>
+#include <QPixmap>
+#include <QTimer>
 
 class Tile : public QObject, public QGraphicsItem
 {
@@ -16,6 +16,9 @@ public:
     };
 
     Tile(QPixmap image, QVector<Frame> frames, QObject* parent = nullptr);
+
+    QSize size() const;
+    void setSize(QSize size);
 
     void playAnimation(bool play);
     void repeatAnimation(bool repeat);
@@ -33,6 +36,7 @@ private:
     QPixmap image_;
     QTimer timer_;
     QVector<Frame> frames_;
+    QSize size_;
     int currentFrame_ = 0;
     bool playedAnimation_ = true;
     bool repeatedAnimation_ = true;

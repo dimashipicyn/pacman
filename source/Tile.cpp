@@ -7,6 +7,10 @@ Tile::Tile(QPixmap image, QVector<Frame> frames, QObject* parent)
     , frames_ { std::move(frames) }
     , currentFrame_ { rand() % frames_.size() }
 {
+    assert(frames_.size() > 0);
+
+    size_ = frames_.front().rect.size();
+
     if (frames_.size() > 1)
     {
         connect(&timer_, &QTimer::timeout, this, &Tile::nextFrame);
@@ -23,7 +27,7 @@ void Tile::repeatAnimation(bool repeat)
 {
     repeatedAnimation_ = repeat;
 }
- 
+
 bool Tile::isPlayedAnimation() const
 {
     return playedAnimation_;
@@ -42,22 +46,30 @@ bool Tile::isRepeated() const
 void Tile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     const Frame& frame = frames_[currentFrame_];
-    painter->drawPixmap(pos(), image_, frame.rect);
+    painter->drawPixmap(boundingRect(), image_, frame.rect);
 }
 
 QRectF Tile::boundingRect() const
 {
-    const qreal penWidth = 1;
-    const QRect& rect = frames_[currentFrame_].rect;
-    return QRectF(pos().x() - penWidth, pos().y() - penWidth, rect.width() + penWidth, rect.height() + penWidth);
+    return QRectF(0, 0, size_.width(), size_.height());
 }
 
 void Tile::nextFrame()
 {
     ++currentFrame_;
     currentFrame_ %= frames_.size();
-    
+
     timer_.setInterval(frames_[currentFrame_].duration);
 
     update(boundingRect());
+}
+
+void Tile::setSize(QSize size)
+{
+    size_ = size;
+}
+
+QSize Tile::size() const
+{
+    return size_;
 }

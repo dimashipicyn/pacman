@@ -34,6 +34,7 @@ public:
     void move(float dt);
     void setSpeed(float speed);
     void setState(State state);
+    void setSize(QSize size);
 
 private:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
