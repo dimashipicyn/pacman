@@ -8,7 +8,7 @@
 
 TmxMap::TmxMap(QObject* parent)
     : QObject(parent)
-    , QGraphicsItem()
+    , QGraphicsItemGroup()
 {
 }
 
@@ -57,17 +57,23 @@ bool TmxMap::load(const QString& tmx_path)
         }
     }
 
-    for (int id : map_)
+    for (int y = 0; y < height_; ++y)
     {
-        if (auto sit = sprites_.find(id); sit == sprites_.end())
+        for (int x = 0; x < width_; ++x)
         {
-            auto tit = std::find_if(tilesets_.begin(), tilesets_.end(), [id](const Tileset& ts)
+            int id = map_[y * width_ + x];
+
+            auto tileset = std::find_if(tilesets_.begin(), tilesets_.end(), [id](const Tileset& ts)
+                { return ts.first_gid <= id && (ts.first_gid + ts.tileset->tileCount()) > id; });
+            if (tileset != tilesets_.end())
             {
-                return ts.first_gid <= id && (ts.first_gid + ts.tileset->tileCount()) > id;
-            });
-            if (tit != tilesets_.end())
-            {
-                sprites_.insert(id, tit->tileset->getTile(id - tit->first_gid));
+                QPointF tile_position(x * tilewidth_, y * tileheight_);
+
+                Tile* tile = tileset->tileset->getTile(id - tileset->first_gid);
+                tile->setPos(tile_position);
+                tile->setSize(QSize(tilewidth_, tileheight_));
+
+                addToGroup(tile);
             }
         }
     }
@@ -85,25 +91,6 @@ TmxObject TmxMap::getObject(const QString& name) const
     }
     qWarning() << "Object with name: '" << name << "' not found!";
     return TmxObject();
-}
-
-void TmxMap::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
-{
-    for (int y = 0; y < height_; ++y)
-    {
-        for (int x = 0; x < width_; ++x)
-        {
-            Tile* s = sprites_.value(map_[y * width_ + x]);
-            QPointF tile_pos = QPointF(rand() % 1000, rand() % 1000); //mapToItem(s, QPointF(x * tilewidth_, y * tileheight_));
-            s->setPos(tile_pos);
-            s->paint(painter, option, widget);
-        }
-    }
-}
-
-QRectF TmxMap::boundingRect() const
-{
-    return QRectF(0, 0, width_ * tilewidth_, height_ * tileheight_);
 }
 
 void TmxMap::parse_map(const QXmlStreamAttributes& attrs)

@@ -3,8 +3,7 @@
 #include "TmxObject.h"
 
 #include <QObject>
-#include <QGraphicsItem>
-#include <QGraphicsItem>
+#include <QGraphicsItemGroup>
 #include <QString>
 #include <QVector>
 #include <QHash>
@@ -16,7 +15,7 @@
 class TsxTileset;
 class Tile;
 
-class TmxMap : public QObject, public QGraphicsItem
+class TmxMap : public QObject, public QGraphicsItemGroup
 {
 public:
     TmxMap(QObject* parent = nullptr);
@@ -26,8 +25,8 @@ public:
     TmxObject getObject(const QString& name) const;
 
 private:
-    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
-    QRectF boundingRect() const override;
+    //void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
+    //QRectF boundingRect() const override;
 
     void parse_map(const QXmlStreamAttributes& attrs);
     void parse_tileset(const QXmlStreamAttributes& attrs);
@@ -45,7 +44,7 @@ private:
 private:
     QVector<int> map_;
     QVector<Tileset> tilesets_;
-    QHash<int, Tile*> sprites_;
+    QVector<Tile*> sprites_;
     QHash<QString, TmxObject> objects_;
     int width_ = 0;
     int height_ = 0;

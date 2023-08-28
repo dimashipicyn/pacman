@@ -12,4 +12,6 @@ public:
 
 private:
 
+    void resizeEvent(QResizeEvent* event) override;
+
 };
