@@ -1,20 +1,22 @@
 #include "Tile.h"
+#include "TsxTile.h"
+#include "TsxTileset.h"
 
-Tile::Tile(QPixmap image, QVector<Frame> frames, QObject* parent)
+Tile::Tile(Tiled::TsxTileset* tileset, Tiled::TsxTile tile, QObject* parent)
     : QObject(parent)
     , QGraphicsItem()
-    , image_ { image }
-    , frames_ { std::move(frames) }
-    , currentFrame_ { rand() % frames_.size() }
+    , tileset_{ tileset }
+    , tile_{tile}
+    , currentFrame_ { rand() % tile.animationFrames() }
 {
-    assert(frames_.size() > 0);
+    Tiled::TsxTileAnimationFrame animFrame = tile.getAnimationFrame(currentFrame_);
+    Tiled::TsxTilesetFrame frame = tileset->getFrameFromId(animFrame.tileId);
+    size_ = frame.srcRect.size();
 
-    size_ = frames_.front().rect.size();
-
-    if (frames_.size() > 1)
+    if (tile.animationFrames() > 1)
     {
         connect(&timer_, &QTimer::timeout, this, &Tile::nextFrame);
-        timer_.start(frames_[currentFrame_].duration);
+        timer_.start(animFrame.duration);
     }
 }
 
@@ -45,8 +47,9 @@ bool Tile::isRepeated() const
 
 void Tile::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
-    const Frame& frame = frames_[currentFrame_];
-    painter->drawPixmap(boundingRect(), image_, frame.rect);
+    Tiled::TsxTileAnimationFrame animFrame = tile_.getAnimationFrame(currentFrame_);
+    Tiled::TsxTilesetFrame frame = tileset_->getFrameFromId(animFrame.tileId);
+    painter->drawPixmap(boundingRect(), frame.image, frame.srcRect);
 }
 
 QRectF Tile::boundingRect() const
@@ -57,9 +60,9 @@ QRectF Tile::boundingRect() const
 void Tile::nextFrame()
 {
     ++currentFrame_;
-    currentFrame_ %= frames_.size();
+    currentFrame_ %= tile_.animationFrames();
 
-    timer_.setInterval(frames_[currentFrame_].duration);
+    timer_.setInterval(tile_.getAnimationFrame(currentFrame_).duration);
 
     update(boundingRect());
 }

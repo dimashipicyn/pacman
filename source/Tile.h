@@ -1,21 +1,18 @@
 #pragma once
 
+#include "TsxTile.h"
+#include "TsxTileset.h"
 #include <QGraphicsItem>
 #include <QPainter>
 #include <QPixmap>
 #include <QTimer>
+#include <cstddef>
 
 class Tile : public QObject, public QGraphicsItem
 {
     Q_OBJECT
 public:
-    struct Frame
-    {
-        QRect rect;
-        int duration;
-    };
-
-    Tile(QPixmap image, QVector<Frame> frames, QObject* parent = nullptr);
+    Tile(Tiled::TsxTileset* tileset, Tiled::TsxTile tile, QObject* parent = nullptr);
 
     QSize size() const;
     void setSize(QSize size);
@@ -33,10 +30,12 @@ public:
 private:
     void nextFrame();
 
-    QPixmap image_;
     QTimer timer_;
-    QVector<Frame> frames_;
     QSize size_;
+
+    Tiled::TsxTileset* tileset_ = nullptr;
+    Tiled::TsxTile tile_;
+    
     int currentFrame_ = 0;
     bool playedAnimation_ = true;
     bool repeatedAnimation_ = true;

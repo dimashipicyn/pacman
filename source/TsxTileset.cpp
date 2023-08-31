@@ -4,21 +4,26 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamAttributes>
 #include <QDebug>
+#include <QtCore/qlogging.h>
 
 namespace Tiled
 {
 
-bool TsxTileset::load(const QString& tsx_path)
+bool TsxTileset::load(const QString& tsx_path, int firstGid)
 {
+    firstGid_ = firstGid;
+
     QFile file(tsx_path);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
+        qWarning() << "TsxTileset not loaded, because file: '" << tsx_path << "' does not exist!";
         return false;
     }
 
     QXmlStreamReader reader(&file);
     if (reader.hasError())
     {
+        qWarning() << "TsxTileset not loaded, because file: '" << tsx_path << "' parsing error! " << reader.error();
         return false;
     }
 
@@ -40,8 +45,10 @@ bool TsxTileset::load(const QString& tsx_path)
         reader.readNextStartElement();
     }
 
-    if (!image_.load(":assets/" + source_))
+    QString filename = ":assets/" + source_;
+    if (!image_.load(filename))
     {
+        qWarning() << "TsxTileset not loaded, because image: '" << filename << "' does not exist!";
         return false;
     }
 
@@ -65,6 +72,11 @@ int TsxTileset::tileHeight() const
     return tileHeight_;
 }
 
+int TsxTileset::firstGid() const
+{
+    return firstGid_;
+}
+
 TsxTile TsxTileset::getTile(const QString& type)
 {
     if (tiles_.contains(type))
@@ -77,19 +89,27 @@ TsxTile TsxTileset::getTile(const QString& type)
 
 TsxTile TsxTileset::getTile(int id)
 {
-    if (ids_.contains(id))
+    int idWithoutOffset = id - firstGid_;
+    if (ids_.contains(idWithoutOffset))
     {
-        return getTile(ids_.value(id));
+        return getTile(ids_.value(idWithoutOffset));
     }
 
     TsxTile tile;
     tile.id = id;
+
+    TsxTileAnimationFrame frame;
+    frame.tileId = id;
+    tile.addAnimationFrame(frame);
     return tile;
 }
 
 TsxTilesetFrame TsxTileset::getFrameFromId(int id)
 {
-    return TsxTilesetFrame();
+    TsxTilesetFrame frame;
+    frame.image = image_;
+    frame.srcRect = getTileRect(id - firstGid_);
+    return frame;
 }
 
 void TsxTileset::parseTileset(const QXmlStreamAttributes& attrs)

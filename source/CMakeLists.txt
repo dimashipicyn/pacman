@@ -8,8 +8,8 @@ target_sources(${PROJECT_NAME} PUBLIC
 	Pacman.cpp
 	Scene.h
 	Scene.cpp
-	TmxMap.h
-	TmxMap.cpp
+	Map.h
+	Map.cpp
 	TmxObject.h
 	TmxObject.cpp
 	TmxMapLoader.h

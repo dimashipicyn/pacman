@@ -22,11 +22,12 @@ struct TsxTilesetFrame
 class TsxTileset
 {
 public:
-    bool load(const QString& tsx_path);
+    bool load(const QString& tsx_path, int firstGid = 0);
 
     int tileCount() const;
     int tileWidth() const;
     int tileHeight() const;
+    int firstGid() const;
 
     TsxTile getTile(const QString& type);
     TsxTile getTile(int id);
@@ -53,6 +54,7 @@ private:
     int margin_ = 0;
     int tileCount_ = 0;
     int columns_ = 0;
+    int firstGid_ = 0;
 };
 
 }

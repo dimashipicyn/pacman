@@ -1,8 +1,9 @@
 #include "Scene.h"
 
 #include "Pacman.h"
+#include "TmxMapLoader.h"
 #include "TsxTileset.h"
-#include "TmxMap.h"
+#include "Map.h"
 #include "Tile.h"
 
 #include <QKeyEvent>
@@ -25,8 +26,9 @@ quint64 secToMs(float sec)
 Scene::Scene(QObject* parent)
     : QGraphicsScene(parent)
 {
-    map_ = new TmxMap(this);
-    map_->load(":/assets/map.tmx");
+    Tiled::TmxMapLoader mapLoader;
+    mapLoader.load(":/assets/map.tmx");
+    map_ = new Map(mapLoader, this);
     addItem(map_);
 
     create_objects();
@@ -40,30 +42,30 @@ Scene::Scene(QObject* parent)
 
 void Scene::keyPressEvent(QKeyEvent* event)
 {
-    if (!event->isAutoRepeat())
-    {
-        switch (event->key())
-        {
-        case Qt::Key_Left:
-        case Qt::Key_A:
-            pacman_->setState(MovableSprite::Left);
-            break;
-        case Qt::Key_Right:
-        case Qt::Key_D:
-            pacman_->setState(MovableSprite::Right);
-            break;
-        case Qt::Key_Up:
-        case Qt::Key_W:
-            pacman_->setState(MovableSprite::Up);
-            break;
-        case Qt::Key_Down:
-        case Qt::Key_S:
-            pacman_->setState(MovableSprite::Down);
-            break;
-        default:
-            break;
-        }
-    }
+    // if (!event->isAutoRepeat())
+    // {
+    //     switch (event->key())
+    //     {
+    //     case Qt::Key_Left:
+    //     case Qt::Key_A:
+    //         pacman_->setState(MovableSprite::Left);
+    //         break;
+    //     case Qt::Key_Right:
+    //     case Qt::Key_D:
+    //         pacman_->setState(MovableSprite::Right);
+    //         break;
+    //     case Qt::Key_Up:
+    //     case Qt::Key_W:
+    //         pacman_->setState(MovableSprite::Up);
+    //         break;
+    //     case Qt::Key_Down:
+    //     case Qt::Key_S:
+    //         pacman_->setState(MovableSprite::Down);
+    //         break;
+    //     default:
+    //         break;
+    //     }
+    // }
 
     QGraphicsScene::keyPressEvent(event);
 }
@@ -77,29 +79,29 @@ void Scene::update()
     delta_time_sec_ = msToSec(elapsed_timer_.elapsed());
     elapsed_timer_.restart();
 
-    pacman_->move(delta_time_sec_);
+    // pacman_->move(delta_time_sec_);
 
     QGraphicsScene::update();
 }
 
 void Scene::create_objects()
 {
-    TmxObject obj = map_->getObject("pacman");
+    // TmxObject obj = map_->getObject("pacman");
     
-    TsxTileset* sheet = new TsxTileset(this);
-    sheet->load(":/assets/" + obj.getProperty("tileset"));
+    // TsxTileset* sheet = new TsxTileset(this);
+    // sheet->load(":/assets/" + obj.getProperty("tileset"));
 
-    pacman_ = new MovableSprite(
-        sheet->getTile(obj.getProperty("idle_tile")),
-        sheet->getTile(obj.getProperty("up_tile")),
-        sheet->getTile(obj.getProperty("down_tile")),
-        sheet->getTile(obj.getProperty("left_tile")),
-        sheet->getTile(obj.getProperty("right_tile")),
-        sheet->getTile(obj.getProperty("destroy_tile")),
-        this);
+    // pacman_ = new MovableSprite(
+    //     sheet->getTile(obj.getProperty("idle_tile")),
+    //     sheet->getTile(obj.getProperty("up_tile")),
+    //     sheet->getTile(obj.getProperty("down_tile")),
+    //     sheet->getTile(obj.getProperty("left_tile")),
+    //     sheet->getTile(obj.getProperty("right_tile")),
+    //     sheet->getTile(obj.getProperty("destroy_tile")),
+    //     this);
 
-    pacman_->setPos(obj.position.x(), obj.position.y());
-    pacman_->setSize(obj.size);
-    pacman_->setSpeed(50);
-    addItem(pacman_);
+    // pacman_->setPos(obj.position.x(), obj.position.y());
+    // pacman_->setSize(obj.size);
+    // pacman_->setSpeed(50);
+    // addItem(pacman_);
 }

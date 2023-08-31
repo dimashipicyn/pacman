@@ -70,14 +70,9 @@ TmxObjectLayer TmxMapLoader::getObjectLayer(const QString& name) const
     return TmxObjectLayer();
 }
 
-TmxTileset TmxMapLoader::getTileset(const QString& name) const
+QVector<TmxTileset> TmxMapLoader::getTilesets() const
 {
-    if (tilesets_.contains(name))
-    {
-        return tilesets_.value(name);
-    }
-    qWarning() << "Tileset '" << name << "' does not exists!";
-    return TmxTileset();
+    return tilesets_;
 }
 
 int TmxMapLoader::width() const
@@ -114,9 +109,7 @@ void TmxMapLoader::parseTilesets(const QXmlStreamAttributes& attrs)
     tileset.firstGid = attrs.value("firstgid").toInt();
     tileset.source = attrs.value("source").toString();
 
-    QString name = QFileInfo(":/assets/" + tileset.source).fileName();
-
-    tilesets_.insert(name, std::move(tileset));
+    tilesets_.push_back(std::move(tileset));
 }
 
 void TmxMapLoader::parseTileLayer(QXmlStreamReader& reader)

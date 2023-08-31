@@ -7,6 +7,7 @@
 
 #include <QString>
 #include <QVector>
+#include <QtCore/qmetatype.h>
 #include <cassert>
 
 class QXmlStreamReader;
@@ -23,7 +24,7 @@ public:
 
     TmxTileLayer getTileLayer(const QString& name) const;
     TmxObjectLayer getObjectLayer(const QString& name) const;
-    TmxTileset getTileset(const QString& name) const;
+    QVector<TmxTileset> getTilesets() const;
 
     int width() const;
     int height() const;
@@ -40,7 +41,7 @@ private:
 private:
     QHash<QString, TmxTileLayer> tileLayers_;
     QHash<QString, TmxObjectLayer> objectLayers_;
-    QHash<QString, TmxTileset> tilesets_;
+    QVector<TmxTileset> tilesets_;
 
     int width_ = 0;
     int height_ = 0;

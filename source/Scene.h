@@ -6,7 +6,7 @@
 
 class MovableSprite;
 class Tile;
-class TmxMap;
+class Map;
 
 class Scene : public QGraphicsScene
 {
@@ -26,7 +26,7 @@ private:
     QTimer* timer_ = nullptr;
     QElapsedTimer elapsed_timer_;
 
-    TmxMap* map_ = nullptr;
+    Map* map_ = nullptr;
     MovableSprite* pacman_;
     float delta_time_sec_ = 0;
 };

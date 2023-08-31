@@ -1,6 +1,7 @@
 {
     "clangd.arguments": [
         "-background-index",
-        "-compile-commands-dir=debug"
+        "-compile-commands-dir=${workspaceFolder}/out/clang-debug",
+        "--query-driver=/usr/bin/clang++"
     ]
 }
