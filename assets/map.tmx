@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="28" height="31" tilewidth="8" tileheight="8" infinite="0" nextlayerid="6" nextobjectid="23">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="28" height="31" tilewidth="8" tileheight="8" infinite="0" nextlayerid="8" nextobjectid="27">
  <tileset firstgid="1" source="maze.tsx"/>
- <layer id="1" name="map" width="28" height="31">
+ <layer id="1" name="map" width="28" height="31" offsetx="3" offsety="-1">
   <data encoding="csv">
 2,11,11,11,11,11,11,11,11,11,44,43,11,11,11,11,44,43,11,11,11,11,11,11,11,11,11,1,
 4,142,142,142,142,142,142,142,142,142,26,25,142,142,142,142,26,25,142,142,142,142,142,142,142,142,142,3,
@@ -37,7 +37,7 @@
 </data>
  </layer>
  <objectgroup id="2" name="objects">
-  <object id="14" name="pacman" x="104" y="163.333" width="16" height="16">
+  <object id="14" name="pacman" x="107" y="163" width="16" height="16">
    <properties>
     <property name="destroy_tile" value="pacman_destroy"/>
     <property name="down_tile" value="pacman_down"/>

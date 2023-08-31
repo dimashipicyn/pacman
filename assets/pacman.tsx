@@ -3,9 +3,9 @@
  <image source="general.png" width="226" height="248"/>
  <tile id="0" type="pacman_right">
   <animation>
-   <frame tileid="0" duration="150"/>
-   <frame tileid="1" duration="150"/>
-   <frame tileid="2" duration="150"/>
+   <frame tileid="0" duration="60"/>
+   <frame tileid="1" duration="60"/>
+   <frame tileid="2" duration="60"/>
   </animation>
  </tile>
  <tile id="2" type="pacman_idle"/>
@@ -26,23 +26,23 @@
  </tile>
  <tile id="14" type="pacman_left">
   <animation>
-   <frame tileid="14" duration="150"/>
-   <frame tileid="15" duration="150"/>
-   <frame tileid="2" duration="150"/>
+   <frame tileid="14" duration="60"/>
+   <frame tileid="15" duration="60"/>
+   <frame tileid="2" duration="60"/>
   </animation>
  </tile>
  <tile id="28" type="pacman_up">
   <animation>
-   <frame tileid="28" duration="150"/>
-   <frame tileid="29" duration="150"/>
-   <frame tileid="2" duration="150"/>
+   <frame tileid="28" duration="60"/>
+   <frame tileid="29" duration="60"/>
+   <frame tileid="2" duration="60"/>
   </animation>
  </tile>
  <tile id="42" type="pacman_down">
   <animation>
-   <frame tileid="42" duration="150"/>
-   <frame tileid="43" duration="150"/>
-   <frame tileid="2" duration="150"/>
+   <frame tileid="42" duration="60"/>
+   <frame tileid="43" duration="60"/>
+   <frame tileid="2" duration="60"/>
   </animation>
  </tile>
  <tile id="56" type="blinky_right">

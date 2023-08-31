@@ -1,60 +1,58 @@
 #pragma once
 
-#include <QObject>
+#include "TsxTile.h"
+
 #include <QPixmap>
-#include <QXmlStreamAttributes>
-#include <QXmlStreamReader>
 #include <QString>
 #include <QVector>
 #include <QHash>
 
-class Tile;
+class QXmlStreamReader;
+class QXmlStreamAttributes;
 
-class TsxTileset : public QObject
+namespace Tiled
 {
-	Q_OBJECT
-public:
-    TsxTileset(QObject* parent = nullptr);
 
+struct TsxTilesetFrame
+{
+    QPixmap image;
+    QRect srcRect;
+};
+
+class TsxTileset
+{
+public:
     bool load(const QString& tsx_path);
-    
+
     int tileCount() const;
     int tileWidth() const;
     int tileHeight() const;
-    Tile* getTile(const QString& type);
-    Tile* getTile(int id);
+
+    TsxTile getTile(const QString& type);
+    TsxTile getTile(int id);
+
+    TsxTilesetFrame getFrameFromId(int id);
 
 private:
-    struct AnimationFrame
-    {
-        int tileId;
-        int duration;
-    };
-
-    struct TilesetTile
-    {
-        int id;
-        QString type;
-        QHash<QString, QString> properties;
-        QVector<AnimationFrame> animation;
-    };
-
-    void parse_tileset(const QXmlStreamAttributes& attrs);
-    void parse_image(const QXmlStreamAttributes& attrs);
-    void parse_tile(QXmlStreamReader& reader);
+    void parseTileset(const QXmlStreamAttributes& attrs);
+    void parseImage(const QXmlStreamAttributes& attrs);
+    void parseTile(QXmlStreamReader& reader);
+    void parseTileAnimation(QXmlStreamReader& reader, TsxTile& tile);
+    void parseTileProperties(QXmlStreamReader& reader, TsxTile& tile);
 
     QRect getTileRect(int id);
-    TilesetTile getTileByType(const QString& type);
 
 private:
     QPixmap image_;
-    QHash<QString, TilesetTile> tiles_;
+    QHash<QString, TsxTile> tiles_;
     QHash<int, QString> ids_;
     QString source_;
-    int tilewidth_ = 0;
-    int tileheight_ = 0;
+    int tileWidth_ = 0;
+    int tileHeight_ = 0;
     int spacing_ = 0;
     int margin_ = 0;
-    int tilecount_ = 0;
+    int tileCount_ = 0;
     int columns_ = 0;
 };
+
+}

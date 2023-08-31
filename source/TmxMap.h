@@ -19,15 +19,11 @@ class TmxMap : public QObject, public QGraphicsItemGroup
 {
 public:
     TmxMap(QObject* parent = nullptr);
-
     bool load(const QString& tmx_path);
 
     TmxObject getObject(const QString& name) const;
 
 private:
-    //void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
-    //QRectF boundingRect() const override;
-
     void parse_map(const QXmlStreamAttributes& attrs);
     void parse_tileset(const QXmlStreamAttributes& attrs);
     void parse_layer(QXmlStreamReader& reader);
@@ -38,14 +34,35 @@ private:
     {
         TsxTileset* tileset = nullptr;
         QString source;
-        int first_gid;
+        int firstGid = 0;
     };
 
+    struct MapLayer
+    {
+        int id = 0;
+        int width = 0;
+        int height = 0;
+        QString name;
+        QVector<int> data;
+    };
+
+    struct ObjectsLayer
+    {
+        int id = 0;
+        QString name;
+        QHash<QString, TmxObject> objects;
+    };
+
+    void create_tilesets();
+    void create_maps();
+    void create_map(const MapLayer& mapLayer);
+
+    Tileset getTilesetFromTileId(int tileId);
+
 private:
-    QVector<int> map_;
     QVector<Tileset> tilesets_;
-    QVector<Tile*> sprites_;
-    QHash<QString, TmxObject> objects_;
+    QVector<MapLayer> mapLayers_;
+    QVector<ObjectsLayer> objects_;
     int width_ = 0;
     int height_ = 0;
     int tilewidth_ = 0;

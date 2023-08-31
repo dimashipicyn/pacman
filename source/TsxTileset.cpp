@@ -1,16 +1,12 @@
 #include "TsxTileset.h"
 
-#include "Tile.h"
-
 #include <QFile>
 #include <QXmlStreamReader>
+#include <QXmlStreamAttributes>
 #include <QDebug>
 
-TsxTileset::TsxTileset(QObject* parent)
-    : QObject(parent)
+namespace Tiled
 {
-
-}
 
 bool TsxTileset::load(const QString& tsx_path)
 {
@@ -30,17 +26,17 @@ bool TsxTileset::load(const QString& tsx_path)
     {
         if (reader.name() == "tileset" && !reader.isEndElement())
         {
-            parse_tileset(reader.attributes());
+            parseTileset(reader.attributes());
         }
         else if (reader.name() == "image" && !reader.isEndElement())
         {
-            parse_image(reader.attributes());
+            parseImage(reader.attributes());
         }
         else if (reader.name() == "tile" && !reader.isEndElement())
         {
-            parse_tile(reader);
+            parseTile(reader);
         }
-        
+
         reader.readNextStartElement();
     }
 
@@ -56,68 +52,66 @@ bool TsxTileset::load(const QString& tsx_path)
 
 int TsxTileset::tileCount() const
 {
-    return tilecount_;
+    return tileCount_;
 }
 
 int TsxTileset::tileWidth() const
 {
-    return tilewidth_;
+    return tileWidth_;
 }
 
 int TsxTileset::tileHeight() const
 {
-    return tileheight_;
+    return tileHeight_;
 }
 
-Tile* TsxTileset::getTile(const QString& type)
+TsxTile TsxTileset::getTile(const QString& type)
 {
-    TilesetTile tile = getTileByType(type);
-    QVector<Tile::Frame> frames;
-    if (tile.animation.empty())
+    if (tiles_.contains(type))
     {
-        frames.push_back({ getTileRect(tile.id), 0});
+        return tiles_.value(type);
     }
-    else
-    {
-        for (const AnimationFrame& frame : tile.animation)
-        {
-            frames.push_back({ getTileRect(frame.tileId), frame.duration });
-        }
-    }
-
-    return new Tile(image_, std::move(frames), this);
+    qWarning() << "Tile with type '" << type << "' does not exist!";
+    return TsxTile();
 }
 
-Tile* TsxTileset::getTile(int id)
+TsxTile TsxTileset::getTile(int id)
 {
     if (ids_.contains(id))
     {
         return getTile(ids_.value(id));
     }
 
-    return new Tile(image_, { { getTileRect(id), 0 } }, this);
+    TsxTile tile;
+    tile.id = id;
+    return tile;
 }
 
-void TsxTileset::parse_tileset(const QXmlStreamAttributes& attrs)
+TsxTilesetFrame TsxTileset::getFrameFromId(int id)
 {
-    tilewidth_ = attrs.value("tilewidth").toInt();
-    tileheight_ = attrs.value("tileheight").toInt();
+    return TsxTilesetFrame();
+}
+
+void TsxTileset::parseTileset(const QXmlStreamAttributes& attrs)
+{
+    tileWidth_ = attrs.value("tilewidth").toInt();
+    tileHeight_ = attrs.value("tileheight").toInt();
     margin_ = attrs.value("margin").toInt();
     spacing_ = attrs.value("spacing").toInt();
-    tilecount_ = attrs.value("tilecount").toInt();
+    tileCount_ = attrs.value("tilecount").toInt();
     columns_ = attrs.value("columns").toInt();
 }
 
-void TsxTileset::parse_image(const QXmlStreamAttributes& attrs)
+void TsxTileset::parseImage(const QXmlStreamAttributes& attrs)
 {
     source_ = attrs.value("source").toString();
 }
 
-void TsxTileset::parse_tile(QXmlStreamReader& reader)
+void TsxTileset::parseTile(QXmlStreamReader& reader)
 {
     QXmlStreamAttributes attrs = reader.attributes();
 
-    TilesetTile tile;
+    TsxTile tile;
 
     tile.id = attrs.value("id").toInt();
     tile.type = attrs.value("type").toString();
@@ -125,36 +119,12 @@ void TsxTileset::parse_tile(QXmlStreamReader& reader)
     reader.readNextStartElement();
     if (reader.name() == "animation")
     {
-        reader.readNextStartElement();
-        while (reader.name() == "frame")
-        {
-            if (reader.isStartElement())
-            {
-                QXmlStreamAttributes attrs = reader.attributes();
-
-                AnimationFrame frame;
-                frame.tileId = attrs.value("tileid").toInt();
-                frame.duration = attrs.value("duration").toInt();
-
-                tile.animation.push_back(std::move(frame));
-            }
-            reader.readNextStartElement();
-        }
+        parseTileAnimation(reader, tile);
     }
 
     if (reader.name() == "properties")
     {
-        reader.readNextStartElement();
-        while (reader.name() == "property" && reader.isStartElement())
-        {
-            QXmlStreamAttributes attrs = reader.attributes();
-
-            QString name = attrs.value("name").toString();
-            QString value = attrs.value("value").toString();
-
-            tile.properties.insert(name, value);
-            reader.readNextStartElement();
-        }
+        parseTileProperties(reader, tile);
     }
 
     QString key = tile.type;
@@ -162,25 +132,50 @@ void TsxTileset::parse_tile(QXmlStreamReader& reader)
     tiles_.insert(key, std::move(tile));
 }
 
+void TsxTileset::parseTileAnimation(QXmlStreamReader& reader, TsxTile& tile)
+{
+    reader.readNextStartElement();
+    while (reader.name() == "frame")
+    {
+        if (reader.isStartElement())
+        {
+            QXmlStreamAttributes attrs = reader.attributes();
+
+            TsxTileAnimationFrame frame;
+            frame.tileId = attrs.value("tileid").toInt();
+            frame.duration = attrs.value("duration").toInt();
+
+            tile.addAnimationFrame(std::move(frame));
+        }
+        reader.readNextStartElement();
+    }
+}
+
+void TsxTileset::parseTileProperties(QXmlStreamReader& reader, TsxTile& tile)
+{
+    reader.readNextStartElement();
+    while (reader.name() == "property" && reader.isStartElement())
+    {
+        QXmlStreamAttributes attrs = reader.attributes();
+
+        QString name = attrs.value("name").toString();
+        QString value = attrs.value("value").toString();
+
+        tile.setProperty(name, value);
+        reader.readNextStartElement();
+    }
+}
+
 QRect TsxTileset::getTileRect(int id)
 {
-    assert(id < tilecount_);
+    assert(id < tileCount_);
 
     int px = id % columns_;
     int py = id / columns_;
-    int x = px * tilewidth_ + margin_ + px * spacing_;
-    int y = py * tileheight_ + margin_ + py * spacing_;
+    int x = px * tileWidth_ + margin_ + px * spacing_;
+    int y = py * tileHeight_ + margin_ + py * spacing_;
 
-    return QRect(x, y, tilewidth_, tileheight_);
+    return QRect(x, y, tileWidth_, tileHeight_);
 }
 
-TsxTileset::TilesetTile TsxTileset::getTileByType(const QString& type)
-{
-    if (auto it = tiles_.find(type); it != tiles_.end())
-    {
-        return *it;
-    }
-    assert(false && "TilesetTile not found");
-    return TilesetTile {};
 }
-

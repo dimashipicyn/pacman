@@ -48,46 +48,20 @@ bool TmxMap::load(const QString& tmx_path)
         reader.readNextStartElement();
     }
 
-    for (Tileset& ts : tilesets_)
-    {
-        ts.tileset = new TsxTileset(this);
-        if (!ts.tileset->load(":/assets/" + ts.source))
-        {
-            return false;
-        }
-    }
-
-    for (int y = 0; y < height_; ++y)
-    {
-        for (int x = 0; x < width_; ++x)
-        {
-            int id = map_[y * width_ + x];
-
-            auto tileset = std::find_if(tilesets_.begin(), tilesets_.end(), [id](const Tileset& ts)
-                { return ts.first_gid <= id && (ts.first_gid + ts.tileset->tileCount()) > id; });
-            if (tileset != tilesets_.end())
-            {
-                QPointF tile_position(x * tilewidth_, y * tileheight_);
-
-                Tile* tile = tileset->tileset->getTile(id - tileset->first_gid);
-                tile->setPos(tile_position);
-                tile->setSize(QSize(tilewidth_, tileheight_));
-
-                addToGroup(tile);
-            }
-        }
-    }
-
-    update();
+    create_tilesets();
+    create_maps();
 
     return true;
 }
 
 TmxObject TmxMap::getObject(const QString& name) const
 {
-    if (auto it = objects_.find(name); it != objects_.end())
+    for (auto& object : objects_)
     {
-        return *it;
+        if (auto it = object.objects.find(name); it != object.objects.end())
+        {
+            return *it;
+        }
     }
     qWarning() << "Object with name: '" << name << "' not found!";
     return TmxObject();
@@ -104,7 +78,7 @@ void TmxMap::parse_map(const QXmlStreamAttributes& attrs)
 void TmxMap::parse_tileset(const QXmlStreamAttributes& attrs)
 {
     Tileset tileset;
-    tileset.first_gid = attrs.value("firstgid").toInt();
+    tileset.firstGid = attrs.value("firstgid").toInt();
     tileset.source = attrs.value("source").toString();
 
     tilesets_.push_back(std::move(tileset));
@@ -114,6 +88,12 @@ void TmxMap::parse_layer(QXmlStreamReader& reader)
 {
     QXmlStreamAttributes attrs = reader.attributes();
 
+    MapLayer mapLayer;
+    mapLayer.id = attrs.value("id").toInt();
+    mapLayer.name = attrs.value("name").toString();
+    mapLayer.width = attrs.value("width").toInt();
+    mapLayer.height = attrs.value("height").toInt();
+
     reader.readNextStartElement();
 
     if (reader.name() == "data")
@@ -121,15 +101,23 @@ void TmxMap::parse_layer(QXmlStreamReader& reader)
         QString value = reader.readElementText();
         for (QString& elem : value.split(","))
         {
-            map_.push_back(elem.toInt());
+            mapLayer.data.push_back(elem.toInt());
         }
 
         reader.readNextStartElement();
     }
+
+    mapLayers_.push_back(std::move(mapLayer));
 }
 
 void TmxMap::parse_objects(QXmlStreamReader& reader)
 {
+    QXmlStreamAttributes attrs = reader.attributes();
+
+    ObjectsLayer objectsLayer;
+    objectsLayer.id = attrs.value("id").toInt();
+    objectsLayer.name = attrs.value("name").toString();
+
     reader.readNextStartElement();
 
     while (reader.name() == "object")
@@ -149,9 +137,11 @@ void TmxMap::parse_objects(QXmlStreamReader& reader)
 
         float x = attrs.value("x").toFloat();
         float y = attrs.value("y").toFloat();
+        obj.position = QPointF(x, y);
+
         float width = attrs.value("width").toFloat();
         float height = attrs.value("height").toFloat();
-        obj.rect = QRect(x, y, width, height);
+        obj.size = QSize(width, height);
 
         reader.readNextStartElement();
         if (reader.name() == "properties")
@@ -160,9 +150,10 @@ void TmxMap::parse_objects(QXmlStreamReader& reader)
             reader.readNextStartElement();
         }
 
-        objects_.insert(obj.name, obj);
+        objectsLayer.objects.insert(obj.name, obj);
     }
-    qDebug() << "name " << reader.name();
+
+    objects_.push_back(std::move(objectsLayer));
 }
 
 void TmxMap::parse_properties(QXmlStreamReader& reader, TmxObject& dest)
@@ -181,4 +172,80 @@ void TmxMap::parse_properties(QXmlStreamReader& reader, TmxObject& dest)
 
         reader.readNextStartElement();
     }
+}
+
+void TmxMap::create_tilesets()
+{
+    for (Tileset& ts : tilesets_)
+    {
+        auto tsxTileset = new TsxTileset(this);
+        if (tsxTileset->load(":/assets/" + ts.source))
+        {
+            ts.tileset = tsxTileset;
+        }
+        else
+        {
+            qWarning() << "Tileset '" << ts.source << "' not loaded!";
+            delete tsxTileset;
+        }
+    }
+
+    // erase not loaded tilesets
+    tilesets_.erase(std::remove_if(tilesets_.begin(), tilesets_.end(), [](const Tileset& ts)
+                        { return ts.tileset == nullptr; }),
+        tilesets_.end());
+}
+
+void TmxMap::create_maps()
+{
+    for (const MapLayer& mapLayer : mapLayers_)
+    {
+        create_map(mapLayer);
+    }
+}
+
+void TmxMap::create_map(const MapLayer& mapLayer)
+{
+    int width = mapLayer.width;
+    int height = mapLayer.height;
+
+    for (int y = 0; y < height_; ++y)
+    {
+        for (int x = 0; x < width_; ++x)
+        {
+            int id = mapLayer.data[y * width_ + x];
+
+            Tileset tileset = getTilesetFromTileId(id);
+
+            QPointF tile_position(x * tilewidth_, y * tileheight_);
+
+            int idWithOffset = id - tileset.firstGid;
+            Tile* tile = tileset.tileset->getTile(idWithOffset);
+            tile->setPos(tile_position);
+            tile->setSize(QSize(tilewidth_, tileheight_));
+
+            addToGroup(tile);
+        }
+    }
+}
+
+TmxMap::Tileset TmxMap::getTilesetFromTileId(int tileId)
+{
+    // find tileset for ids range
+    auto tilesetFinder = [tileId](const Tileset& ts)
+    {
+        bool greaterThanFirstGid = ts.firstGid <= tileId;
+        bool lessThanTileCount = (ts.firstGid + ts.tileset->tileCount()) > tileId;
+        return greaterThanFirstGid && lessThanTileCount;
+    };
+
+    auto tileset = std::find_if(tilesets_.begin(), tilesets_.end(), std::move(tilesetFinder));
+    if (tileset != tilesets_.end())
+    {
+        return *tileset;
+    }
+
+    qWarning() << "Tileset with tile id: " << tileId << " not found!";
+    assert(false);
+    return Tileset();
 }

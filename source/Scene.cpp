@@ -98,8 +98,8 @@ void Scene::create_objects()
         sheet->getTile(obj.getProperty("destroy_tile")),
         this);
 
-    pacman_->setPos(obj.rect.x(), obj.rect.y());
-    pacman_->setSize(obj.rect.size());
-    pacman_->setSpeed(20);
+    pacman_->setPos(obj.position.x(), obj.position.y());
+    pacman_->setSize(obj.size);
+    pacman_->setSpeed(50);
     addItem(pacman_);
 }
