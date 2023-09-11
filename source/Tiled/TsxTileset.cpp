@@ -137,14 +137,25 @@ void TsxTileset::parseTile(QXmlStreamReader& reader)
     tile.type = attrs.value("type").toString();
 
     reader.readNextStartElement();
+    
+    if(reader.name() == "properties")
+    {
+        parseTileProperties(reader, tile);
+    }
+
+    if (reader.name() == "objectgroup")
+    {
+        parseTileObjects(reader, tile);
+    }
+    
     if (reader.name() == "animation")
     {
         parseTileAnimation(reader, tile);
     }
 
-    if (reader.name() == "properties")
+    if (tile.animationFrames() == 0)
     {
-        parseTileProperties(reader, tile);
+        tile.addAnimationFrame(Tiled::TsxTileAnimationFrame { tile.id, 0 });
     }
 
     QString key = tile.type;
@@ -169,19 +180,90 @@ void TsxTileset::parseTileAnimation(QXmlStreamReader& reader, TsxTile& tile)
         }
         reader.readNextStartElement();
     }
+    if (reader.name() == "animation" && reader.isEndElement())
+    {
+        reader.readNextStartElement();
+    }
 }
 
 void TsxTileset::parseTileProperties(QXmlStreamReader& reader, TsxTile& tile)
 {
     reader.readNextStartElement();
-    while (reader.name() == "property" && reader.isStartElement())
+    while (reader.name() == "property")
     {
+        if (reader.isStartElement())
+        {
+            QXmlStreamAttributes attrs = reader.attributes();
+
+            QString name = attrs.value("name").toString();
+            QString value = attrs.value("value").toString();
+
+            tile.setProperty(name, value);
+        }
+        reader.readNextStartElement();
+    }
+    if (reader.name() == "properties" && reader.isEndElement())
+    {
+        reader.readNextStartElement();
+    }
+}
+
+void TsxTileset::parseTileObjects(QXmlStreamReader& reader, TsxTile& tile)
+{
+    reader.readNextStartElement();
+    while (reader.name() == "object")
+    {
+        if (reader.isEndElement())
+        {
+            reader.readNextStartElement();
+            continue;
+        }
+
         QXmlStreamAttributes attrs = reader.attributes();
 
-        QString name = attrs.value("name").toString();
-        QString value = attrs.value("value").toString();
+        TmxObject obj;
+        obj.id = attrs.value("id").toInt();
+        obj.name = attrs.value("name").toString();
+        obj.type = attrs.value("type").toString();
+        obj.id = attrs.value("gid").toInt();
 
-        tile.setProperty(name, value);
+        float x = attrs.value("x").toFloat();
+        float y = attrs.value("y").toFloat();
+        obj.position = QPointF(x, y);
+
+        float width = attrs.value("width").toFloat();
+        float height = attrs.value("height").toFloat();
+        obj.size = QSize(width, height);
+
+        reader.readNextStartElement();
+        if (reader.name() == "properties")
+        {
+            parseObjectProperties(reader, obj);
+            reader.readNextStartElement();
+        }
+
+        tile.addObject(obj);
+    }
+    if (reader.name() == "objectgroup" && reader.isEndElement())
+    {
+        reader.readNextStartElement();
+    }
+}
+
+void TsxTileset::parseObjectProperties(QXmlStreamReader& reader, TmxObject& dest)
+{
+    reader.readNextStartElement();
+
+    while (reader.name() == "property")
+    {
+        if (reader.isStartElement())
+        {
+            QXmlStreamAttributes attrs = reader.attributes();
+            QString name = attrs.value("name").toString();
+            QString value = attrs.value("value").toString();
+            dest.addProperty(name, value);
+        }
+
         reader.readNextStartElement();
     }
 }

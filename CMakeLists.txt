@@ -8,7 +8,7 @@ set(CMAKE_AUTOUIC ON)
 add_executable(${PROJECT_NAME}
     main.cpp
     resources.qrc
- "source/TmxMapLoader.h" "source/TmxMapLoader.cpp" "source/TmxTileLayer.h" "source/TmxTileLayer.cpp" "source/TmxObjectLayer.cpp" "source/TmxTileset.h" "source/TsxTile.h" "source/TsxTile.cpp")
+)
 
 add_subdirectory(source)
 add_subdirectory(third_party)

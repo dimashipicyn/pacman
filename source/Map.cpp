@@ -1,8 +1,8 @@
 #include "Map.h"
 
-#include "TmxTileset.h"
-#include "TsxTile.h"
-#include "TsxTileset.h"
+#include "Tiled/TmxTileset.h"
+#include "Tiled/TsxTile.h"
+#include "Tiled/TsxTileset.h"
 #include "Tile.h"
 
 #include <QFile>
@@ -63,7 +63,7 @@ void Map::createMap(Tiled::TmxMapLoader& mapLoader)
             Tile* tile = new Tile(tileset, tsxTile, this);
             tile->setPos(tile_position);
             tile->setSize(QSize(tileWidth, tileHeight));
-
+             
             addToGroup(tile);
         }
     }

@@ -48,7 +48,7 @@
     <property name="up_tile" value="pacman_up"/>
    </properties>
   </object>
-  <object id="19" name="blinky" x="104" y="76.3333" width="16" height="16">
+  <object id="19" name="blinky" x="107" y="75" width="16" height="16">
    <properties>
     <property name="destroy_tile" value="blinky_destroy"/>
     <property name="down_tile" value="blinky_down"/>
@@ -59,7 +59,7 @@
     <property name="up_tile" value="blinky_up"/>
    </properties>
   </object>
-  <object id="20" name="clyde" x="120.333" y="96" width="16" height="16">
+  <object id="20" name="clyde" x="123" y="95" width="16" height="16">
    <properties>
     <property name="destroy_tile" value="clyde_destroy"/>
     <property name="down_tile" value="clyde_down"/>
@@ -70,7 +70,7 @@
     <property name="up_tile" value="clyde_up"/>
    </properties>
   </object>
-  <object id="21" name="pinky" x="104" y="96" width="16" height="16">
+  <object id="21" name="pinky" x="107" y="95" width="16" height="16">
    <properties>
     <property name="destroy_tile" value="pinky_destroy"/>
     <property name="down_tile" value="pinky_down"/>
@@ -81,7 +81,7 @@
     <property name="up_tile" value="pinky_up"/>
    </properties>
   </object>
-  <object id="22" name="inky" x="87.6667" y="95.6667" width="16" height="16">
+  <object id="22" name="inky" x="91" y="95" width="16" height="16">
    <properties>
     <property name="destroy_tile" value="inky_destroy"/>
     <property name="down_tile" value="inky_down"/>

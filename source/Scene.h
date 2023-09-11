@@ -7,6 +7,12 @@
 class MovableSprite;
 class Tile;
 class Map;
+class CollisionWorld;
+
+namespace Tiled
+{
+class TmxMapLoader;
+}
 
 class Scene : public QGraphicsScene
 {
@@ -20,7 +26,7 @@ protected:
 
 private:
     void update();
-    void create_objects();
+    void createObjects(const Tiled::TmxMapLoader& mapLoader);
 
 private:
     QTimer* timer_ = nullptr;
@@ -29,4 +35,5 @@ private:
     Map* map_ = nullptr;
     MovableSprite* pacman_;
     float delta_time_sec_ = 0;
+    CollisionWorld* cw = nullptr;
 };

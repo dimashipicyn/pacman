@@ -40,6 +40,8 @@ private:
     void parseTile(QXmlStreamReader& reader);
     void parseTileAnimation(QXmlStreamReader& reader, TsxTile& tile);
     void parseTileProperties(QXmlStreamReader& reader, TsxTile& tile);
+    void parseTileObjects(QXmlStreamReader& reader, TsxTile& tile);
+    void parseObjectProperties(QXmlStreamReader& reader, TmxObject& dest);
 
     QRect getTileRect(int id);
 

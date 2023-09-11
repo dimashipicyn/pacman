@@ -1,4 +1,7 @@
 
+add_subdirectory(Tiled)
+add_subdirectory(Collision)
+
 target_sources(${PROJECT_NAME} PUBLIC
 	MainView.h
 	MainView.cpp
@@ -10,17 +13,4 @@ target_sources(${PROJECT_NAME} PUBLIC
 	Scene.cpp
 	Map.h
 	Map.cpp
-	TmxObject.h
-	TmxObject.cpp
-	TmxMapLoader.h
-	TmxMapLoader.cpp
-	TmxTileLayer.h
-	TmxTileLayer.cpp
-	TmxObjectLayer.h
-	TmxObjectLayer.cpp
-	TmxTileset.h
-	TsxTile.h
-	TsxTile.cpp
-	TsxTileset.h
-	TsxTileset.cpp
 )

@@ -161,6 +161,7 @@ void TmxMapLoader::parseObjectLayer(QXmlStreamReader& reader)
         TmxObject obj;
         obj.id = attrs.value("id").toInt();
         obj.name = attrs.value("name").toString();
+        obj.type = attrs.value("type").toString();
         obj.id = attrs.value("gid").toInt();
 
         float x = attrs.value("x").toFloat();

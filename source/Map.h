@@ -1,8 +1,8 @@
 #pragma once
 
-#include "TmxMapLoader.h"
-#include "TmxTileLayer.h"
-#include "TsxTileset.h"
+#include "Tiled/TmxMapLoader.h"
+#include "Tiled/TmxTileLayer.h"
+#include "Tiled/TsxTileset.h"
 
 #include <QObject>
 #include <QGraphicsItemGroup>

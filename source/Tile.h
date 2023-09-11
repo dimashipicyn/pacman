@@ -1,7 +1,7 @@
 #pragma once
 
-#include "TsxTile.h"
-#include "TsxTileset.h"
+#include "Tiled/TsxTile.h"
+#include "Tiled/TsxTileset.h"
 #include <QGraphicsItem>
 #include <QPainter>
 #include <QPixmap>

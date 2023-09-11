@@ -12,8 +12,9 @@ class TmxObject
 {
 public:
     QString name;
-    int id;
-    int gid;
+    QString type;
+    int id = 0;
+    int gid = 0;
     QPointF position;
     QSize size;
 

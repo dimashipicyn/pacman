@@ -2,6 +2,16 @@
 <tileset version="1.10" tiledversion="1.10.2" name="general" tilewidth="16" tileheight="16" margin="1" tilecount="210" columns="14">
  <image source="general.png" width="226" height="248"/>
  <tile id="0" type="pacman_right">
+  <properties>
+   <property name="petuh" value="chons"/>
+  </properties>
+  <objectgroup draworder="index" id="2">
+   <object id="1" name="kekw" type="lolz" x="2" y="0" width="13" height="13">
+    <properties>
+     <property name="objectprop" value="prop"/>
+    </properties>
+   </object>
+  </objectgroup>
   <animation>
    <frame tileid="0" duration="60"/>
    <frame tileid="1" duration="60"/>

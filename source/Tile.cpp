@@ -1,14 +1,15 @@
 #include "Tile.h"
-#include "TsxTile.h"
-#include "TsxTileset.h"
+#include "Tiled/TsxTile.h"
+#include "Tiled/TsxTileset.h"
 
 Tile::Tile(Tiled::TsxTileset* tileset, Tiled::TsxTile tile, QObject* parent)
     : QObject(parent)
     , QGraphicsItem()
     , tileset_{ tileset }
     , tile_{tile}
-    , currentFrame_ { rand() % tile.animationFrames() }
 {
+    currentFrame_ = tile.animationFrames() ? rand() % tile.animationFrames() : 0;
+
     Tiled::TsxTileAnimationFrame animFrame = tile.getAnimationFrame(currentFrame_);
     Tiled::TsxTilesetFrame frame = tileset->getFrameFromId(animFrame.tileId);
     size_ = frame.srcRect.size();
